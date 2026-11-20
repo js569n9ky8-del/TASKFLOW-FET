@@ -1,0 +1,681 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow FET | Gestor de tareas</title>
+
+<style>
+:root {
+    --primary: #3978e8;
+    --dark: #17243b;
+    --bg: #f3f6fc;
+    --white: #ffffff;
+    --text: #26344d;
+    --muted: #8290a6;
+    --border: #e5eaf2;
+    --green: #159b72;
+    --red: #df5252;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+header {
+    background: var(--dark);
+    color: white;
+    padding: 22px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #65a0ff;
+}
+
+header p {
+    font-size: 13px;
+    color: #c5d1e4;
+}
+
+.container {
+    max-width: 1150px;
+    margin: 35px auto;
+    padding: 0 20px;
+}
+
+.welcome {
+    margin-bottom: 25px;
+}
+
+.welcome h1 {
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.welcome p {
+    color: var(--muted);
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #17243b0b;
+}
+
+.stat-card p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.stat-card h2 {
+    font-size: 30px;
+    margin-top: 10px;
+}
+
+.panel {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 3px 15px #17243b0b;
+    margin-bottom: 25px;
+}
+
+.panel h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-weight: bold;
+    font-size: 13px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background: white;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--primary);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 85px;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 17px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: .2s;
+}
+
+button:hover {
+    opacity: .85;
+    transform: translateY(-1px);
+}
+
+.primary {
+    background: var(--primary);
+    color: white;
+}
+
+.secondary {
+    background: #e9eef7;
+    color: var(--text);
+}
+
+.danger {
+    background: #ffeded;
+    color: var(--red);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.toolbar input {
+    flex: 1;
+}
+
+.toolbar select {
+    max-width: 190px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th, td {
+    padding: 15px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+th {
+    color: var(--muted);
+    background: #f8faff;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.pending {
+    background: #fff3d8;
+    color: #a46a00;
+}
+
+.progress {
+    background: #e3efff;
+    color: #2767c8;
+}
+
+.completed {
+    background: #ddf7ec;
+    color: #128459;
+}
+
+.priority {
+    font-weight: bold;
+}
+
+.actions {
+    display: flex;
+    gap: 7px;
+}
+
+.actions button {
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 35px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+@media(max-width: 700px) {
+    header {
+        padding: 20px;
+        gap: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+        grid-column: auto;
+    }
+
+    .toolbar {
+        flex-direction: column;
+    }
+
+    .toolbar select {
+        max-width: none;
+    }
+
+    .welcome h1 {
+        font-size: 23px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">TaskFlow <span>FET</span></div>
+    <p>Gestión inteligente de actividades</p>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <h1>Panel de tareas académicas</h1>
+        <p>Organiza, administra y controla tus actividades.</p>
+    </section>
+
+    <section class="stats">
+        <div class="stat-card">
+            <p>Total de tareas</p>
+            <h2 id="total">0</h2>
+        </div>
+        <div class="stat-card">
+            <p>En proceso</p>
+            <h2 id="inProgress">0</h2>
+        </div>
+        <div class="stat-card">
+            <p>Completadas</p>
+            <h2 id="completed">0</h2>
+        </div>
+    </section>
+
+    <section class="panel" id="formPanel">
+        <h2 id="formTitle">Registrar nueva tarea</h2>
+
+        <form id="taskForm">
+            <div class="form-grid">
+
+                <div class="field">
+                    <label for="taskTitle">Nombre de la tarea *</label>
+                    <input id="taskTitle" type="text"
+                    maxlength="80" placeholder="Ej: Diseñar página web"
+                    required>
+                </div>
+
+                <div class="field">
+                    <label for="taskDate">Fecha de entrega *</label>
+                    <input id="taskDate" type="date" required>
+                </div>
+
+                <div class="field full">
+                    <label for="taskDescription">Descripción</label>
+                    <textarea id="taskDescription"
+                    maxlength="500"
+                    placeholder="Describe la actividad..."></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="taskStatus">Estado</label>
+                    <select id="taskStatus">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En proceso">En proceso</option>
+                        <option value="Completada">Completada</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="taskPriority">Prioridad</label>
+                    <select id="taskPriority">
+                        <option value="Alta">Alta</option>
+                        <option value="Media" selected>Media</option>
+                        <option value="Baja">Baja</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button class="primary" type="submit" id="saveButton">
+                    Guardar tarea
+                </button>
+
+                <button class="secondary" type="button"
+                id="cancelButton" hidden>
+                    Cancelar edición
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Mis actividades</h2>
+
+        <div class="toolbar">
+            <input type="search" id="search"
+            placeholder="Buscar tarea...">
+
+            <select id="filter">
+                <option value="Todas">Todos los estados</option>
+                <option value="Pendiente">Pendientes</option>
+                <option value="En proceso">En proceso</option>
+                <option value="Completada">Completadas</option>
+            </select>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tarea</th>
+                        <th>Fecha</th>
+                        <th>Prioridad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="taskList"></tbody>
+            </table>
+        </div>
+
+        <p id="emptyMessage" class="empty" hidden>
+            No hay tareas registradas.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    TaskFlow FET © 2026 | Proyecto académico de Ingeniería de Software
+</footer>
+
+<script>
+const STORAGE_KEY = "taskflow_fet_tasks";
+
+const form = document.getElementById("taskForm");
+const titleInput = document.getElementById("taskTitle");
+const dateInput = document.getElementById("taskDate");
+const descriptionInput = document.getElementById("taskDescription");
+const statusInput = document.getElementById("taskStatus");
+const priorityInput = document.getElementById("taskPriority");
+const taskList = document.getElementById("taskList");
+const searchInput = document.getElementById("search");
+const filterInput = document.getElementById("filter");
+const saveButton = document.getElementById("saveButton");
+const cancelButton = document.getElementById("cancelButton");
+const formTitle = document.getElementById("formTitle");
+
+let tasks = loadTasks();
+let editingId = null;
+
+function loadTasks() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return Array.isArray(saved) ? saved : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function createId() {
+    if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return Date.now().toString() + Math.random().toString(16).slice(2);
+}
+
+// CREATE: registrar una nueva tarea.
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const title = titleInput.value.trim();
+
+    if (!title) {
+        alert("Debes escribir el nombre de la tarea.");
+        return;
+    }
+
+    if (!dateInput.value) {
+        alert("Debes seleccionar una fecha.");
+        return;
+    }
+
+    const taskData = {
+        title: title,
+        description: descriptionInput.value.trim(),
+        date: dateInput.value,
+        status: statusInput.value,
+        priority: priorityInput.value
+    };
+
+    if (editingId !== null) {
+        // UPDATE: modificar la tarea existente.
+        tasks = tasks.map(task =>
+            task.id === editingId
+                ? { ...task, ...taskData }
+                : task
+        );
+
+        alert("Tarea actualizada correctamente.");
+    } else {
+        // CREATE: agregar un nuevo registro.
+        tasks.push({
+            id: createId(),
+            ...taskData,
+            createdAt: new Date().toISOString()
+        });
+
+        alert("Tarea registrada correctamente.");
+    }
+
+    saveTasks();
+    resetForm();
+    renderTasks();
+});
+
+// READ: consultar y mostrar los registros.
+function renderTasks() {
+    const search = searchInput.value.toLowerCase().trim();
+    const filter = filterInput.value;
+
+    const filteredTasks = tasks.filter(task => {
+        const matchesSearch =
+            task.title.toLowerCase().includes(search) ||
+            task.description.toLowerCase().includes(search);
+
+        const matchesFilter =
+            filter === "Todas" || task.status === filter;
+
+        return matchesSearch && matchesFilter;
+    });
+
+    taskList.innerHTML = "";
+
+    filteredTasks.forEach(task => {
+        const row = document.createElement("tr");
+
+        const titleCell = document.createElement("td");
+        const strong = document.createElement("strong");
+        strong.textContent = task.title;
+        titleCell.appendChild(strong);
+
+        const dateCell = document.createElement("td");
+        dateCell.textContent = task.date;
+
+        const priorityCell = document.createElement("td");
+        priorityCell.textContent = task.priority;
+        priorityCell.className = "priority";
+
+        const statusCell = document.createElement("td");
+        const statusBadge = document.createElement("span");
+        statusBadge.textContent = task.status;
+        statusBadge.className = "status " + getStatusClass(task.status);
+        statusCell.appendChild(statusBadge);
+
+        const actionsCell = document.createElement("td");
+        actionsCell.className = "actions";
+
+        const editButton = document.createElement("button");
+        editButton.textContent = "Editar";
+        editButton.className = "primary";
+        editButton.addEventListener("click", () => editTask(task.id));
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Eliminar";
+        deleteButton.className = "danger";
+        deleteButton.addEventListener("click", () => deleteTask(task.id));
+
+        actionsCell.append(editButton, deleteButton);
+
+        row.append(
+            titleCell,
+            dateCell,
+            priorityCell,
+            statusCell,
+            actionsCell
+        );
+
+        taskList.appendChild(row);
+    });
+
+    document.getElementById("emptyMessage").hidden =
+        filteredTasks.length !== 0;
+
+    updateStats();
+}
+
+function getStatusClass(status) {
+    if (status === "Pendiente") return "pending";
+    if (status === "En proceso") return "progress";
+    return "completed";
+}
+
+// UPDATE: cargar los datos en el formulario.
+function editTask(id) {
+    const task = tasks.find(item => item.id === id);
+
+    if (!task) return;
+
+    editingId = id;
+
+    titleInput.value = task.title;
+    descriptionInput.value = task.description;
+    dateInput.value = task.date;
+    statusInput.value = task.status;
+    priorityInput.value = task.priority;
+
+    formTitle.textContent = "Editar tarea";
+    saveButton.textContent = "Actualizar tarea";
+    cancelButton.hidden = false;
+
+    document.getElementById("formPanel").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+// DELETE: eliminar una tarea.
+function deleteTask(id) {
+    const task = tasks.find(item => item.id === id);
+
+    if (!task) return;
+
+    const confirmed = confirm(
+        "¿Estás segura de eliminar la tarea: " + task.title + "?"
+    );
+
+    if (!confirmed) return;
+
+    tasks = tasks.filter(item => item.id !== id);
+
+    if (editingId === id) {
+        resetForm();
+    }
+
+    saveTasks();
+    renderTasks();
+
+    alert("Tarea eliminada correctamente.");
+}
+
+function resetForm() {
+    form.reset();
+    editingId = null;
+
+    formTitle.textContent = "Registrar nueva tarea";
+    saveButton.textContent = "Guardar tarea";
+    cancelButton.hidden = true;
+}
+
+function updateStats() {
+    document.getElementById("total").textContent = tasks.length;
+
+    document.getElementById("inProgress").textContent =
+        tasks.filter(task => task.status === "En proceso").length;
+
+    document.getElementById("completed").textContent =
+        tasks.filter(task => task.status === "Completada").length;
+}
+
+// Buscar y filtrar tareas.
+searchInput.addEventListener("input", renderTasks);
+filterInput.addEventListener("change", renderTasks);
+
+// Cancelar una edición.
+cancelButton.addEventListener("click", resetForm);
+
+// Primera carga de la aplicación.
+renderTasks();
+</script>
+
+</body>
+</html>
